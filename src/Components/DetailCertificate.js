@@ -49,7 +49,8 @@ const DetailCertificate = () => {
     };
 
     const handleCopyUrl = () => {
-        navigator.clipboard.writeText(pdfUrl)
+        const productionURL = `https://abidandconode-8gax.vercel.app/certificate/show/${currentUser.certificateNo}`
+        navigator.clipboard.writeText(productionURL)
             .then(() => setCopySuccess("URL copied!"))
             .catch(() => setCopySuccess("Failed to copy URL"));
     };
