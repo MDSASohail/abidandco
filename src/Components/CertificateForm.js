@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-
+import {BaseURL, saveCertificate} from '../Functions/JSFunctions'
 const CertificateForm = ({setShowForm}) => {
   const [formData, setFormData] = useState({
     name: '',
@@ -21,21 +21,12 @@ const CertificateForm = ({setShowForm}) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const production = "https://abidandconode.vercel.app/certificate/saveCertificate";
-    const local =  'http://localhost:8000/certificate/saveCertificate'
-
-    const response = await fetch(production, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(formData),
-    });
-
-    // const result = await response.json();
-    // console.log('Server Response:', response);
-    // alert("Certificate Submitted Successfully");
-    // console.log("Form data", formData)
+    const response = await saveCertificate(formData);
+    if(response.status){
+      console.log("Form saved")
+    }else{
+      console.log("Form not saved");
+    }
     setShowForm(false);
   };
 

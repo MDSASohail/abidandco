@@ -1,31 +1,39 @@
 import { useEffect, useState } from "react"
 import CertificateForm from './CertificateForm';
 import CertificateResult from "./CertificateResult";
+import axios from 'axios';
+import {BaseURL} from '../Functions/JSFunctions'
 import { formatDateToDDMMYYYY, fetchAllCertificate } from "../Functions/JSFunctions";
+import PDFUpload from "./PDFUpload";
+import {addAllCertificate, addCurrentUser} from '../Store/CertificateSlice'
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 const AllCertificate = () => {
     const [showForm, setShowForm] = useState(false);
-    const [allCertificatesToPopulate, setAllCertificates] = useState([]);
-
-    // const cer = {
-    //     name: 'HIRAN HUSSAIN',
-    //     description: 'OSHA GENERAL INDUSTRY - 30Hrs',
-    //     issuedBy: 'IQ-OHS',
-    //     certificationNo: 'IQ-263438',
-    //     dateOfIssue: '29/Mar/2024',
-    //     validThrough: 'Life Time',
-    // }
-
+    const [pdf, setPDF] = useState(false)
+    // const [allCertificatesToPopulate, setAllCertificates] = useState([]);
+    const allCertificatesToPopulate = useSelector(state => state.certificate.allCertificate)
+    //  console.log("All certificate ", allCertificatesToPopulate)
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
     useEffect(() => {
         const fetchCertificate = async () => {
             console.log("Fetching user")
             const response =await fetchAllCertificate();
-            console.log("Res", response)
-            setAllCertificates(response)
+        
+            dispatch(addAllCertificate(response))
         }
 
         fetchCertificate()
 
-    }, [])
+    }, [showForm])
+
+    const handleCurrentUserSetup = (currentUser)=>{
+            console.log("Cer to populate", currentUser);
+            dispatch(addCurrentUser(currentUser));
+            navigate('detailCertificate')
+    }
+    
     return (
         <div>
             <div className="flex justify-between h-14 bg-black text-white items-center px-4 py-4">
@@ -47,7 +55,7 @@ const AllCertificate = () => {
                     </thead>
                     <tbody>
                         {
-                           Array.isArray(allCertificatesToPopulate) &&   allCertificatesToPopulate.map(eachCertificate => <tr key={eachCertificate.certificateNo} className="bg-gray-100">
+                           Array.isArray(allCertificatesToPopulate) &&   allCertificatesToPopulate.map(eachCertificate => <tr onClick={()=>{handleCurrentUserSetup(eachCertificate)}} key={eachCertificate.certificateNo}  className="bg-gray-100 hover:cursor-pointer">
                                 <td className="px-4 py-2 border">{eachCertificate.name}</td>
                                 <td className="px-4 py-2 border">{eachCertificate.description}</td>
                                 <td className="px-4 py-2 border">{eachCertificate.issuedBy}</td>
@@ -62,6 +70,10 @@ const AllCertificate = () => {
             {
                 showForm && <div className="fixed w-screen h-screen"><CertificateForm setShowForm={setShowForm} /></div>
             }
+
+            {/* {
+                pdf && <div>  <PDFUpload/> </div>
+            } */}
         </div>
     )
 }
