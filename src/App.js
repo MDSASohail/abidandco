@@ -9,7 +9,7 @@ import { useSelector } from 'react-redux';
 import CertificateView from './Components/CertificateView.js';
 function App() {
   const data = useSelector(state =>state);
-  console.log("Data is", data)
+  // console.log("Data is", data)
   return (
     <div >
       <Router>

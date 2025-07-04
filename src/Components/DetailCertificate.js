@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import pdfFile from '../Images/563.pdf'
-import { fetchPDFOfaUser, formatDateToDDMMYYYY, deletePDF } from "../Functions/JSFunctions";
+import { fetchPDFOfaUser, formatDateToDDMMYYYY, deletePDF, BaseURL } from "../Functions/JSFunctions";
 import { useSelector } from "react-redux";
 
 import PDFUpload from "./PDFUpload";
+import PDFViewer from "./PDFViewer";
 const DetailCertificate = () => {
     const [pdfUrl, setPdfUrl] = useState(null);
+    console.log("PDF usr",pdfUrl)
     const [copySuccess, setCopySuccess] = useState("");
     const currentUser = useSelector(state => state.certificate.currentUser);
     const [upload, setUpload] = useState(false);
@@ -15,7 +17,7 @@ const DetailCertificate = () => {
             try {
                 const response = await fetchPDFOfaUser(currentUser.certificateNo);
                 if (response.status) {
-                    // console.log("Fetch pdf", response)
+                    console.log("Fetch pdf", response)
                     setPdfUrl(response.data);
                 } else {
                     console.log("Failed: ", response.message);
@@ -110,11 +112,7 @@ const DetailCertificate = () => {
                     <h2 className="text-xl font-bold mb-4">PDF Preview</h2>
                     <div className="border border-gray-300 rounded-lg overflow-hidden h-[500px]">
                         {
-                            pdfUrl !== null ? <iframe
-                            src={pdfUrl}
-                            title="PDF Viewer"
-                            className="w-full h-full"
-                        ></iframe> : <div>PDF not uploaded</div>
+                            pdfUrl !== null ? <PDFViewer pdfUrl={`https://abidandconode.vercel.app/certificate/getPDF/${currentUser.certificateNo}`}/>: <div>PDF not uploaded</div>
                         }
                     </div>
                 </div>

@@ -76,17 +76,18 @@ export const fetchPDFOfaUser = async (id) => {
             },
             body: JSON.stringify({ id: id })
         });
-        
+
 
         if (!response.ok) {
             throw new Error("Failed to fetch PDF");
         }
 
         const contentType = response.headers.get("Content-Type");
-        if(contentType.includes("applicatison/json")){
-            return {status:true, data:null}
+        if (contentType.includes("application/json")) {
+            return { status: true, data: null };
         }
-        
+
+
         const blob = await response.blob();
         console.log("Fetch pdf ", blob)
         const url = URL.createObjectURL(blob);
@@ -97,35 +98,35 @@ export const fetchPDFOfaUser = async (id) => {
     }
 };
 
-export const savePDFOfAUser = async(formData)=>{
+export const savePDFOfAUser = async (formData) => {
     try {
 
-      const response = await fetch(`${BaseURL}certificate/uploadPDF`,  {
-        method:"POST",
-        body:formData
-        
-      } )
+        const response = await fetch(`${BaseURL}certificate/uploadPDF`, {
+            method: "POST",
+            body: formData
 
-      if(!response.ok){
-        return {status:false, error:"Something went wrong"}
+        })
 
-      }
-      const blob = await response.blob();
-      console.log("Blob is ", blob)
-      const url = URL.createObjectURL(blob)
-       return {status:true, data:url}
-       
+        if (!response.ok) {
+            return { status: false, error: "Something went wrong" }
+
+        }
+        const blob = await response.blob();
+        console.log("Blob is ", blob)
+        const url = URL.createObjectURL(blob)
+        return { status: true, data: url }
+
     } catch (error) {
-      console.error("Error uploading file:", error);
-       return {status:false, data:error.message}
+        console.error("Error uploading file:", error);
+        return { status: false, data: error.message }
     }
 }
 
-export const deletePDF =  async (id)=>{
+export const deletePDF = async (id) => {
     console.log("Deleting", id)
     try {
-        const response = await fetch(`${BaseURL}certificate/deletePDF`,{
-            method:"POST",
+        const response = await fetch(`${BaseURL}certificate/deletePDF`, {
+            method: "POST",
             headers: {
                 "content-type": "application/json"
             },
@@ -133,10 +134,10 @@ export const deletePDF =  async (id)=>{
         })
 
         // const parseData = await response.json();
-        return {status:true};
+        return { status: true };
         console.log("Delete response", response);
     } catch (error) {
-        return {status:false, error:error.message}
+        return { status: false, error: error.message }
     }
 }
 
