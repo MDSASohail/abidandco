@@ -29,7 +29,7 @@ const CertificateVerificationPage = () => {
 
   return (
     <div className="flex flex-col items-center text-center   ">
-      <a href="https://iq-ohs.com/index.php" target='_black'><img src={BackgroundIMG} /></a>
+      <a href="#" ><img src={BackgroundIMG} /></a>
       <h1 className="text-3xl font-bold mb-2">Verification</h1>
       <p className="max-w-2xl text-gray-700 mb-2">
         All certificates issued by IQ-OHS and its ATP can be verified online with a unique certificate number. To verify a certificate, input the certificate no. below.
