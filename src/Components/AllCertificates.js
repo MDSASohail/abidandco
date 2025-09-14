@@ -2,12 +2,14 @@ import { useEffect, useState } from "react"
 import CertificateForm from './CertificateForm';
 import CertificateResult from "./CertificateResult";
 import axios from 'axios';
-import {BaseURL} from '../Functions/JSFunctions'
-import { formatDateToDDMMYYYY, fetchAllCertificate } from "../Functions/JSFunctions";
+import {BaseURL} from '../Functions/certificate'
+import { formatDateToDDMMYYYY, fetchAllCertificate } from "../Functions/certificate";
 import PDFUpload from "./PDFUpload";
 import {addAllCertificate, addCurrentUser} from '../Store/CertificateSlice'
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+
+
 const AllCertificate = () => {
     const [showForm, setShowForm] = useState(false);
     const [pdf, setPDF] = useState(false)
@@ -16,12 +18,16 @@ const AllCertificate = () => {
     //  console.log("All certificate ", allCertificatesToPopulate)
     const dispatch = useDispatch();
     const navigate = useNavigate();
+
+    
     useEffect(() => {
         const fetchCertificate = async () => {
-            console.log("Fetching user")
-            const response =await fetchAllCertificate();
-        
-            dispatch(addAllCertificate(response))
+            try {
+                  const response =await fetchAllCertificate();
+                  dispatch(addAllCertificate(response))
+            } catch (error) {
+                console.log("Error in fetching certificates. ", error.message)
+            }
         }
 
         fetchCertificate()
@@ -29,9 +35,9 @@ const AllCertificate = () => {
     }, [showForm])
 
     const handleCurrentUserSetup = (currentUser)=>{
-            console.log("Cer to populate", currentUser);
-            dispatch(addCurrentUser(currentUser));
-            navigate('detailCertificate')
+            // console.log("Cer to populate", currentUser);
+            // dispatch(addCurrentUser(currentUser));
+            navigate(`detailCertificate/${currentUser.certificateNo}`)
     }
     
     return (

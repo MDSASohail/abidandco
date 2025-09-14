@@ -1,6 +1,6 @@
 import React from 'react';
 import LoadingSpinner from './LoadingSpinner';
-import { formatDateToDDMMYYYY } from '../Functions/JSFunctions';
+import { formatDateToDDMMYYYY } from '../Functions/certificate';
 
 
 const CertificateResult = ({ loading, result, finishLoading }) => {
@@ -9,6 +9,7 @@ const CertificateResult = ({ loading, result, finishLoading }) => {
   }
 
   if(!result && finishLoading) return <div>Invalid Certificate Number</div>
+  
   if (!result) return null;
 
   return (

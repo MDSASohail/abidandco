@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {BaseURL, saveCertificate} from '../Functions/JSFunctions'
+import {BaseURL, saveCertificate} from '../Functions/certificate'
 const CertificateForm = ({setShowForm}) => {
   const [formData, setFormData] = useState({
     name: '',

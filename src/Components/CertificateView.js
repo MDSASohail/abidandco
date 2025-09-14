@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { fetchPDFOfaUser, formatDateToDDMMYYYY, getCertificateByID, BaseURL } from "../Functions/JSFunctions";
+import { fetchPDFOfaUser, formatDateToDDMMYYYY, getCertificateByID, BaseURL } from "../Functions/certificate";
 import PDFViewer from "./PDFViewer";
 
 
@@ -8,7 +8,6 @@ export default function CertificateView() {
   const [pdfURL, setPdfUrl] = useState(null);
   const [certificate, setCertificate] = useState({ name: "", date: "" });
   const params = useParams();
-  // console.log("Params is ", params)
 
   useEffect(() => {
     const fetchPDF = async () => {
@@ -28,7 +27,7 @@ export default function CertificateView() {
         console.log("Error in fetching PDF", error);
       }
     };
-    // fetchPDF();
+    fetchPDF();
   }, []);
   return (
     <div
@@ -56,16 +55,7 @@ export default function CertificateView() {
         </span><span className="pl-4 text-sm">This document is valid and was issued by IOSH (Institution of Occupational Safety and Health) to {certificate.name} on {formatDateToDDMMYYYY(certificate.dateOfIssue)}</span></div>
 
         <div className="border-t border-gray-300">
-          {/* {
-            pdfURL === null ? <div className="w-full h-[120vh]">PDF not uploded</div> : <iframe
-              src={`${BaseURL}certificate/getPDF/${params.id}`}
-              width="100%"
-              height="600px"
-            ></iframe>
-
-          } */}
-          
-          <PDFViewer pdfUrl={'https://abidandconode.vercel.app/certificate/getPDF/IQ-872842'}/>
+          <PDFViewer pdfUrl={`${BaseURL}certificate/getPDF/${params.id}`}/>
         </div>
       </div>
     </div>

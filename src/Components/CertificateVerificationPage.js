@@ -1,29 +1,13 @@
-import React, { useState } from 'react';
+import  { useState } from 'react';
 import CertificateSearch from './CertificateSearch';
 import CertificateResult from './CertificateResult';
 import BackgroundIMG from '../Images/Background.png'
-import { BaseURL, getCertificateByID } from '../Functions/JSFunctions'
+import { BaseURL, getCertificateByID } from '../Functions/certificate'
 const CertificateVerificationPage = () => {
-  const [loading, setLoading] = useState(false);
-  const [finishLoading, setFinishLoading] = useState(false)
-  const [result, setResult] = useState(null);
 
-  const fetchCertificate = async (certificateCode) => {
-    setLoading(true);
-    setResult(null);
-    setFinishLoading(false)
-    try {
-      const response = await getCertificateByID(certificateCode)
-      if (response.status) {
-        setResult(response.data);
-      }
+  const [certificateResult, setCertificateResult] = useState({loading:false, finishLoading:false, result:null});
 
-    } catch (err) {
-      console.error('Fetch error:', err);
-    }
-    setLoading(false);
-    setFinishLoading(true)
-  };
+  
 
 
 
@@ -36,8 +20,8 @@ const CertificateVerificationPage = () => {
       </p>
       <p className="text-sm text-gray-600 mb-2">Please contact us regarding fraudulent certificates.</p>
 
-      <CertificateSearch onSearch={fetchCertificate} />
-      <CertificateResult loading={loading} result={result} finishLoading={finishLoading} />
+      <CertificateSearch setCertificateResult={setCertificateResult} />
+      <CertificateResult loading={certificateResult.loading} result={certificateResult.result} finishLoading={certificateResult.finishLoading} />
     </div>
   );
 };

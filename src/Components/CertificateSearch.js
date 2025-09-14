@@ -1,22 +1,46 @@
-import React, { useState } from 'react';
+import  { useState, useRef } from 'react';
+import { getCertificateByID } from '../Functions/certificate';
 
-const CertificateSearch = ({ onSearch }) => {
-  const [inputValue, setInputValue] = useState('');
+const CertificateSearch = ({ setCertificateResult }) => {
+  
+  const certificateNumber = useRef(); // Holds certificate number
 
+  // Submit the form
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (inputValue.trim()) {
-      onSearch(inputValue.trim());
+    if (certificateNumber.current.value.trim()) {
+      fetchCertificate(certificateNumber.current.value.trim())
     }
+
+   
+  };
+
+
+  // Ferch certificate and also maintaining loading and results.
+   const fetchCertificate = async (certificateCode) => {
+
+    setCertificateResult(pre=>({...pre, loading:true}))
+    setCertificateResult(pre =>({...pre, result:null}))
+    setCertificateResult(pre =>({...pre, finishLoading:false}))
+    try {
+      const response = await getCertificateByID(certificateCode)
+      if (response.status) {
+        setCertificateResult(pre =>({...pre, result:response.data}))
+      }
+
+    } catch (err) {
+      console.error('Fetch error:', err);
+    }
+     setCertificateResult(pre=>({...pre, loading:false}))
+     setCertificateResult(pre =>({...pre, finishLoading:true}))
   };
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row items-center gap-4 mb-8">
       <input
         type="text"
+        ref={certificateNumber}
         placeholder="Enter Certificate Code"
-        value={inputValue}
-        onChange={(e) => setInputValue(e.target.value)}
         className="px-4 py-2 border border-gray-300 rounded-md w-72 text-center focus:outline-none focus:ring-2 focus:ring-green-500"
       />
       <button

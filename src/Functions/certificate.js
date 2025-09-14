@@ -1,5 +1,3 @@
-import { data } from "react-router-dom";
-
 const productionBaseURL = "https://abidandconode.vercel.app/";
 const localBaseURL = "http://localhost:8000/";
 
@@ -18,18 +16,11 @@ export const formatDateToDDMMYYYY = function (isoDateString) {
 
 export const fetchAllCertificate = async () => {
 
-    // console.log("Fetching start")
-    try {
-
         const URL = `${BaseURL}certificate/getAllCertificate`
-        const response = await fetch(URL, { method: 'POST' });
+        const response = await fetch(URL, { method: 'GET' });
         const certificates = await response.json();
-        // console.log("Fetched certificates are", certificates);
         return certificates;
-    } catch (error) {
-        console.log("error in fetching certificatees", error.message);
-        return [];
-    }
+    
 }
 
 export const saveCertificate = async (formData) => {
@@ -67,39 +58,25 @@ export const getCertificateByID = async (id) => {
 }
 
 export const fetchPDFOfaUser = async (id) => {
-    console.log("ID to search", id);
-    try {
-        const response = await fetch(`${BaseURL}certificate/getPDF`, {
-            method: 'POST',
-            headers: {
-                "content-type": "application/json"
-            },
-            body: JSON.stringify({ id: id })
-        });
+        // console.log("ID to search", id);
+    
+        const response = await fetch(`${BaseURL}certificate/getPDF/${id}`);
 
 
+        // Throw error if PDF not found
         if (!response.ok) {
-            throw new Error("Failed to fetch PDF");
+            const message = await response.json()
+            throw new Error(message.message);
         }
-
-        const contentType = response.headers.get("Content-Type");
-        if (contentType.includes("application/json")) {
-            return { status: true, data: null };
-        }
-
 
         const blob = await response.blob();
-        console.log("Fetch pdf ", blob)
         const url = URL.createObjectURL(blob);
-        // console.log("Blob", blob)
-        return { status: true, data: url };
-    } catch (error) {
-        return { status: false, message: error.message };
-    }
+        return url;
+   
 };
 
 export const savePDFOfAUser = async (formData) => {
-    try {
+    
 
         const response = await fetch(`${BaseURL}certificate/uploadPDF`, {
             method: "POST",
@@ -107,24 +84,23 @@ export const savePDFOfAUser = async (formData) => {
 
         })
 
+        // console.log("Uploading PDF", response)
+
         if (!response.ok) {
-            return { status: false, error: "Something went wrong" }
+            // return { status: false, error: "Something went wrong" };
+            const error = await response.json()
+            throw new Error({status:false, error:error.message})
 
         }
-        const blob = await response.blob();
-        console.log("Blob is ", blob)
-        const url = URL.createObjectURL(blob)
-        return { status: true, data: url }
+        // const blob = await response.blob();
+        // console.log("Blob is ", blob)
+        // const url = URL.createObjectURL(blob)
+        return { status: true }
 
-    } catch (error) {
-        console.error("Error uploading file:", error);
-        return { status: false, data: error.message }
-    }
+   
 }
 
 export const deletePDF = async (id) => {
-    console.log("Deleting", id)
-    try {
         const response = await fetch(`${BaseURL}certificate/deletePDF`, {
             method: "POST",
             headers: {
@@ -133,12 +109,14 @@ export const deletePDF = async (id) => {
             body: JSON.stringify({ userID: id })
         })
 
-        // const parseData = await response.json();
-        return { status: true };
-        console.log("Delete response", response);
-    } catch (error) {
-        return { status: false, error: error.message }
-    }
+        if(response.ok){
+            return {status:true}
+        }else{
+            return {status:false};
+        }
+
+
+    
 }
 
 

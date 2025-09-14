@@ -17,11 +17,10 @@ function App() {
             <Route path='certificate/adminImamu' element={<AllCertificate/>}/>
             <Route path='certificate' element={<CertificateVerificationPage/>}/>
             <Route path='certificate/show/:id' element={<CertificateView/>}/>
-            <Route path='certificate/adminImamu/detailCertificate' element={<DetailCertificate/>}/>
+            <Route path='certificate/adminImamu/detailCertificate/:id' element={<DetailCertificate/>}/>
             <Route path='*'   element={<Navigate to="/certificate"/>}/>
         </Routes>
       </Router>
-      {/* <AllCertificate/> */}
     </div>
   );
 }

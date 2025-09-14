@@ -1,9 +1,10 @@
-import React, { useState } from "react";
-import {savePDFOfAUser} from '../Functions/JSFunctions'
+import  { useState } from "react";
+import {savePDFOfAUser} from '../Functions/certificate'
 
-const PDFUpload = ({userID, setPdfUrl, setUpload}) => {
+const PDFUpload = ({userID, setUpload}) => {
   const [selectedFile, setSelectedFile] = useState(null);
-  console.log("User id in PDF", userID)
+
+  
   const handleFileChange = (e) => {
     setSelectedFile(e.target.files[0]);
   };
@@ -23,11 +24,7 @@ const PDFUpload = ({userID, setPdfUrl, setUpload}) => {
         const response = await savePDFOfAUser(formData, userID);
         
         if(response.status){
-          // console.log("Status in PDG", response)
-          // setPdfUrl(response.data);
           setUpload(false)
-        }else{
-          alert(response.data)
         }
 
       } catch (error) {

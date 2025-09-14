@@ -1,31 +1,39 @@
 import { useEffect, useState } from "react";
-import pdfFile from '../Images/563.pdf'
-import { fetchPDFOfaUser, formatDateToDDMMYYYY, deletePDF, BaseURL } from "../Functions/JSFunctions";
+import { fetchPDFOfaUser, formatDateToDDMMYYYY, deletePDF, BaseURL, getCertificateByID } from "../Functions/certificate";
 import { useSelector } from "react-redux";
 
 import PDFUpload from "./PDFUpload";
-import PDFViewer from "./PDFViewer";
-const DetailCertificate = () => {
-    const [pdfUrl, setPdfUrl] = useState(null);
-    console.log("PDF usr",pdfUrl)
-    const [copySuccess, setCopySuccess] = useState("");
-    const currentUser = useSelector(state => state.certificate.currentUser);
-    const [upload, setUpload] = useState(false);
 
+import {  useParams } from "react-router-dom";
+const DetailCertificate = () => {
+    const [isPDFAvailable, setIsPDFAvailable] = useState(null);
+    const [copySuccess, setCopySuccess] = useState("");
+    const [upload, setUpload] = useState(false);
+    const currentURL = useParams();
+    const [certificateDetail, setCertificateDetail] = useState({name:"", description:"", issuedBy:"", id:currentURL.id, dateOfIssue:"", validThrough:""})
+    
     useEffect(() => {
         const fetchPDF = async () => {
             try {
-                const response = await fetchPDFOfaUser(currentUser.certificateNo);
-                if (response.status) {
-                    console.log("Fetch pdf", response)
-                    setPdfUrl(response.data);
-                } else {
-                    console.log("Failed: ", response.message);
-                }
+                const response = await fetchPDFOfaUser(currentURL.id);
+                setIsPDFAvailable(response);
             } catch (error) {
-                console.log("Error in fetching PDF", error);
+                console.log("Error in fetching PDF", error.message);
             }
+
+
+            try {
+                  const response = await getCertificateByID(currentURL.id)
+                  if (response.status) {
+                    setCertificateDetail({name:response.data.name, description:response.data.description, issuedBy:response.data.issuedBy, id:currentURL.id, dateOfIssue:response.data.dateOfIssue, validThrough:response.data.validThrough})
+                  }
+            
+                } catch (err) {
+                  console.error('Fetch error:', err);
+                }
         };
+
+        
         fetchPDF();
     }, [upload]);
 
@@ -38,20 +46,18 @@ const DetailCertificate = () => {
 
     const handleDelete = async() => {
         try {
-            const response = await deletePDF(currentUser.certificateNo);
+            const response = await deletePDF(currentURL.id);
             if(response.status){
-                setPdfUrl(null);
-            }else{
-                alert(response.error)
+                setIsPDFAvailable(null);
             }
             
         } catch (error) {
-            console.log("Error in deleting message");
+            console.log("Error in deleting message.", error.message);
         }
     };
 
     const handleCopyUrl = () => {
-        const productionURL = `https://abidandconode-8gax.vercel.app/certificate/show/${currentUser.certificateNo}`
+        const productionURL = `https://abidandconode-8gax.vercel.app/certificate/show/${currentURL.id}`
         navigator.clipboard.writeText(productionURL)
             .then(() => setCopySuccess("URL copied!"))
             .catch(() => setCopySuccess("Failed to copy URL"));
@@ -61,7 +67,7 @@ const DetailCertificate = () => {
         <div className="min-h-screen bg-gray-100">
             {
                 upload && <div onClick={()=>{setUpload(false)}} className="absolute  top-0 left-0 min-h-screen w-screen flex justify-center items-center  bg-[rgba(243,244,246,0.5)] ">
-                    <div onClick={(e)=>{e.stopPropagation()}}><PDFUpload userID={currentUser.certificateNo} setPdfUrl={setPdfUrl} setUpload={setUpload}/></div>
+                    <div onClick={(e)=>{e.stopPropagation()}}><PDFUpload userID={currentURL.id} setUpload={setUpload}/></div>
                 </div>
            
             }
@@ -92,28 +98,44 @@ const DetailCertificate = () => {
             </nav>
 
             {/* Main content */}
-            <div className="flex flex-row p-4 gap-4">
+            <div className=" p-4 gap-4">
                 {/* Left 40% section */}
-                <div className="w-2/5 bg-white p-4 rounded-2xl shadow">
-                    <h2 className="text-xl font-bold mb-4">PDF Details</h2>
-                    <div className="space-y-2">
-                        <div><span className="font-semibold">NAME:</span> {currentUser.name}</div>
-                        <div><span className="font-semibold">DESCRIPTION:</span> {currentUser.description}</div>
-                        <div><span className="font-semibold">ISSUED BY:</span> {currentUser.issuedBy}</div>
-                        <div><span className="font-semibold">CERTIFICATION NO:</span> {currentUser.certificateNo}</div>
-                        <div><span className="font-semibold">DATE OF ISSUE:</span> {formatDateToDDMMYYYY(currentUser.dateOfIssue)}</div>
-                        <div><span className="font-semibold">VALID THROUGH:</span> {currentUser.validThrough}</div>
-                        <div><a href={pdfUrl} download={"myFile.pdf"}>Downlod PDF</a></div>
-                    </div>
+                <div className=" bg-white p-4 rounded-2xl shadow">
+                
+                    <table className="min-w-full border border-gray-300 text-sm text-center">
+                    <thead className="bg-black text-white">
+                        <tr>
+                            <th className="px-4 py-2 border">NAME</th>
+                            <th className="px-4 py-2 border">DESCRIPTION</th>
+                            <th className="px-4 py-2 border">ISSUED BY</th>
+                            <th className="px-4 py-2 border">CERTIFICATION NO</th>
+                            <th className="px-4 py-2 border">DATE OF ISSUE</th>
+                            <th className="px-4 py-2 border">VALID THROUGH</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {
+                             <tr  className="bg-gray-100 ">
+                                <td className="px-4 py-2 border">{certificateDetail.name}</td>
+                                <td className="px-4 py-2 border">{certificateDetail.description}</td>
+                                <td className="px-4 py-2 border">{certificateDetail.issuedBy}</td>
+                                <td className="px-4 py-2 border">{certificateDetail.id}</td>
+                                <td className="px-4 py-2 border">{formatDateToDDMMYYYY(certificateDetail.dateOfIssue)}</td>
+                                <td className="px-4 py-2 border">{certificateDetail.validThrough}</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
                 </div>
 
                 {/* Right 60% section */}
-                <div className="w-3/5 bg-white p-4 rounded-2xl shadow">
+                <div className=" bg-white p-4 rounded-2xl shadow">
                     <h2 className="text-xl font-bold mb-4">PDF Preview</h2>
-                    <div className="border border-gray-300 rounded-lg overflow-hidden h-[500px]">
+                    <div className="border border-gray-300 rounded-lg h-[900px]">
                         {
-                            pdfUrl !== null ? <PDFViewer pdfUrl={`https://abidandconode.vercel.app/certificate/getPDF/${currentUser.certificateNo}`}/>: <div>PDF not uploaded</div>
+                            isPDFAvailable ? <iframe  className="h-full w-full" src={`https://abidandconode.vercel.app/certificate/getPDF/${currentURL.id}`} frameborder="0"></iframe> : <p>PDF is not available right now. Please try again later.</p>
                         }
+                        
                     </div>
                 </div>
             </div>
